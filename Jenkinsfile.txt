@@ -1,0 +1,57 @@
+  pipeline {
+    agent any
+
+    environment {
+        VENV = "venv"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',  url: 'https://github.com/Dhana-testing/Labex_project1''
+            }
+        }
+
+        stage('Setup Python & Dependencies') {
+            steps {
+                sh 'python3 -m venv ${VENV}'
+                sh '. ${VENV}/bin/activate && pip install --upgrade pip'
+                sh '. ${VENV}/bin/activate && pip install -r requirements.txt'
+                // Install Appium Python client explicitly
+                sh '. ${VENV}/bin/activate && pip install Appium-Python-Client'
+            }
+        }
+
+        stage('Start Appium Server') {
+            steps {
+                // Assumes Appium is installed globally via npm
+                sh 'nohup appium --log-level info > appium.log 2>&1 &'
+            }
+        }
+
+        stage('Run PyTest with Appium') {
+            steps {
+                sh '. ${VENV}/bin/activate && pytest -q --junitxml=results/pytest-report.xml'
+            }
+            post {
+                always {
+                    junit 'results/pytest-report.xml'
+                }
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: 'results/**', fingerprint: true
+                archiveArtifacts artifacts: 'appium.log', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished!'
+        }
+    }
+}
+

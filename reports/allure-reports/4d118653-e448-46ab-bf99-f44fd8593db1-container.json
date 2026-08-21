@@ -1,0 +1,1 @@
+{"uuid": "aa1c50b9-cd66-40c0-90bb-e63c203ea18c", "befores": [{"name": "scroll_text", "status": "passed", "start": 1787035549991, "stop": 1787035549991}], "afters": [{"name": "scroll_text::<lambda>", "start": 1787035607125}], "start": 1787035549991, "stop": 1787035607126}
